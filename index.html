@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arraiá do QG – Thamarinha</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Patrick+Hand&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --red: #c0392b; --yellow: #f1c40f; --green: #27ae60;
+      --blue: #2980b9; --orange: #e67e22; --purple: #8e44ad;
+      --bg: #fff8e1; --wood: #7B4A2A; --wood-dark: #4a2c0a;
+      --cream: #fffde7; --text: #3e2723;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      font-family: 'Patrick Hand', cursive;
+      min-height: 100vh;
+      color: var(--text);
+    }
+    /* ── Bunting ── */
+    .bunting { width: 100%; line-height: 0; }
+    .bunting svg { display: block; width: 100%; height: auto; }
+    /* ── Layout ── */
+    .container { max-width: 680px; margin: 0 auto; padding: 0 16px 48px; }
+    .page-title {
+      font-family: 'Fredoka One', cursive;
+      font-size: 2.2rem; text-align: center;
+      color: var(--red); text-shadow: 2px 2px 0 var(--yellow);
+      margin: 16px 0 10px;
+    }
+    /* ── Image ── */
+    .invite-img {
+      width: 100%; max-width: 480px; display: block;
+      margin: 0 auto 24px; border-radius: 12px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+      border: 4px solid var(--wood);
+    }
+    /* ── Card (form) ── */
+    .card {
+      background: var(--wood); border-radius: 16px;
+      padding: 20px; margin-bottom: 24px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    }
+    .card-inner {
+      border: 2px dashed rgba(255,255,255,0.25);
+      border-radius: 10px; padding: 18px;
+    }
+    .card-title {
+      font-family: 'Fredoka One', cursive; font-size: 1.7rem;
+      color: var(--yellow); text-align: center;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.4); margin-bottom: 20px;
+    }
+    .form-group { margin-bottom: 18px; }
+    .flabel { display: block; color: #fff; font-size: 1.05rem; font-weight: bold; margin-bottom: 8px; }
+    .flabel small { font-size: 0.8rem; font-weight: normal; opacity: 0.75; }
+    .text-input {
+      width: 100%; padding: 10px 14px; border-radius: 8px;
+      border: 2px solid transparent; font-family: 'Patrick Hand', cursive;
+      font-size: 1rem; background: var(--cream); color: var(--wood-dark);
+      transition: border-color 0.2s;
+    }
+    .text-input:focus { outline: none; border-color: var(--yellow); }
+    /* ── Option grid (checkboxes) ── */
+    .option-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(128px, 1fr));
+      gap: 7px;
+    }
+    .option-grid input[type="checkbox"] { display: none; }
+    .option-grid label {
+      background: rgba(255,255,255,0.15); color: #fff;
+      border: 2px solid rgba(255,255,255,0.2); border-radius: 10px;
+      padding: 8px 8px; cursor: pointer; text-align: center;
+      font-size: 0.87rem; transition: all 0.15s; display: block;
+    }
+    .option-grid input[type="checkbox"]:checked + label {
+      background: var(--yellow); color: var(--wood-dark);
+      border-color: var(--yellow); font-weight: bold;
+    }
+    .option-grid label:hover { background: rgba(255,255,255,0.25); }
+    .custom-wrap { display: none; margin-top: 8px; }
+    .custom-wrap.show { display: block; }
+    /* ── Submit ── */
+    .btn-submit {
+      width: 100%; padding: 14px; background: var(--red); color: #fff;
+      border: none; border-radius: 10px;
+      font-family: 'Fredoka One', cursive; font-size: 1.4rem;
+      cursor: pointer; margin-top: 8px;
+      box-shadow: 0 5px 0 #922b21;
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+    .btn-submit:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 7px 0 #922b21; }
+    .btn-submit:active:not(:disabled) { transform: translateY(3px); box-shadow: 0 2px 0 #922b21; }
+    .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+    /* ── Toast ── */
+    .msg { margin-top: 12px; padding: 12px 16px; border-radius: 8px; text-align: center; display: none; }
+    .msg.success { background: #d4edda; color: #155724; display: block; border-left: 4px solid #28a745; }
+    .msg.error   { background: #f8d7da; color: #721c24; display: block; border-left: 4px solid #dc3545; }
+    /* ── Section cards ── */
+    .section-card {
+      background: #fff; border-radius: 14px; padding: 20px;
+      margin-bottom: 20px; box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+      border-top: 4px solid var(--red);
+    }
+    .section-card-title {
+      font-family: 'Fredoka One', cursive; font-size: 1.4rem;
+      color: var(--wood-dark); margin-bottom: 14px; text-align: center;
+    }
+    /* ── Stats ── */
+    .stats { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 14px; }
+    .stat { background: var(--yellow); color: var(--wood-dark); border-radius: 20px; padding: 4px 14px; font-size: 0.9rem; font-weight: bold; }
+    /* ── Guest row ── */
+    .guest-row {
+      display: flex; align-items: center; padding: 10px 12px;
+      background: #fafafa; border-radius: 8px; margin-bottom: 8px;
+      border-left: 4px solid var(--red);
+    }
+    .guest-name { flex: 1; font-weight: bold; font-size: 1rem; }
+    .btn-remove {
+      background: var(--red); color: #fff; border: none;
+      border-radius: 6px; padding: 5px 12px; cursor: pointer;
+      font-family: 'Patrick Hand', cursive; font-size: 0.85rem;
+      transition: background 0.2s; white-space: nowrap; flex-shrink: 0;
+    }
+    .btn-remove:hover { background: #a93226; }
+    .btn-remove.confirming { background: #7b241c; }
+    /* ── Items ── */
+    .items-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .items-col-title { font-family: 'Fredoka One', cursive; font-size: 1.1rem; color: var(--wood-dark); margin-bottom: 10px; }
+    .item-row {
+      display: flex; justify-content: space-between; align-items: center;
+      background: #f5f5f5; border-radius: 20px; padding: 5px 12px;
+      margin-bottom: 6px; font-size: 0.92rem;
+    }
+    .item-count {
+      background: var(--yellow); color: var(--wood-dark); border-radius: 12px;
+      padding: 1px 8px; font-weight: bold; font-size: 0.85rem; margin-left: 8px; white-space: nowrap;
+    }
+    .empty { color: #aaa; font-style: italic; text-align: center; padding: 10px 0; font-size: 0.9rem; }
+    /* ── Config warning ── */
+    .config-warn {
+      background: #fff3cd; border: 2px solid var(--orange); border-radius: 10px;
+      padding: 16px; margin-bottom: 20px; font-size: 0.95rem; color: #856404;
+    }
+    .config-warn code { background: rgba(0,0,0,0.08); padding: 1px 5px; border-radius: 3px; font-size: 0.9em; }
+    /* ── Responsive ── */
+    @media (max-width: 480px) {
+      .items-cols { grid-template-columns: 1fr; }
+      .option-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); }
+      .page-title { font-size: 1.7rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Top bunting ── -->
+<div class="bunting">
+  <svg viewBox="0 0 1200 80" xmlns="http://www.w3.org/2000/svg">
+    <line x1="0" y1="18" x2="1200" y2="18" stroke="#5D3A1A" stroke-width="2.5"/>
+    <polygon points="50,18 82,72 18,72"     fill="#c0392b"/>
+    <polygon points="150,18 182,72 118,72"  fill="#f1c40f"/>
+    <polygon points="250,18 282,72 218,72"  fill="#27ae60"/>
+    <polygon points="350,18 382,72 318,72"  fill="#2980b9"/>
+    <polygon points="450,18 482,72 418,72"  fill="#e67e22"/>
+    <polygon points="550,18 582,72 518,72"  fill="#8e44ad"/>
+    <polygon points="650,18 682,72 618,72"  fill="#c0392b"/>
+    <polygon points="750,18 782,72 718,72"  fill="#f1c40f"/>
+    <polygon points="850,18 882,72 818,72"  fill="#27ae60"/>
+    <polygon points="950,18 982,72 918,72"  fill="#2980b9"/>
+    <polygon points="1050,18 1082,72 1018,72" fill="#e67e22"/>
+    <polygon points="1150,18 1182,72 1118,72" fill="#c0392b"/>
+  </svg>
+</div>
+
+<div class="container">
+  <h1 class="page-title">🌟 Arraiá do QG 🌟</h1>
+
+  <img src="./thamarinha.png" alt="Convite Arraiá do QG – Thamarinha" class="invite-img">
+
+  <div class="config-warn" id="config-warn" style="display:none">
+    ⚠️ <strong>Configure o Supabase:</strong> Abra o <code>index.html</code>, localize
+    <code>SUPABASE_URL</code> e <code>SUPABASE_ANON_KEY</code> e substitua pelos valores do seu projeto.
+    Execute <code>supabase_setup.sql</code> no SQL Editor antes de usar.
+  </div>
+
+  <!-- ── Formulário ── -->
+  <div class="card">
+    <div class="card-inner">
+      <h2 class="card-title">🌽 Confirme sua Presença! 🌽</h2>
+      <form id="rsvp-form">
+
+        <div class="form-group">
+          <label class="flabel" for="name">Seu nome:</label>
+          <input type="text" id="name" class="text-input"
+                 placeholder="Como te chamam no forró?" required autocomplete="off">
+        </div>
+
+        <div class="form-group">
+          <span class="flabel">Comidinha que vai trazer: <small>(pode marcar mais de uma)</small></span>
+          <div class="option-grid">
+            <input type="checkbox" name="food" id="f-canjica" value="Canjica">
+            <label for="f-canjica">🌽 Canjica</label>
+            <input type="checkbox" name="food" id="f-pamonha" value="Pamonha">
+            <label for="f-pamonha">🌽 Pamonha</label>
+            <input type="checkbox" name="food" id="f-bolo" value="Bolo de milho">
+            <label for="f-bolo">🎂 Bolo de milho</label>
+            <input type="checkbox" name="food" id="f-pe" value="Pé-de-moleque">
+            <label for="f-pe">🥜 Pé-de-moleque</label>
+            <input type="checkbox" name="food" id="f-pipoca" value="Pipoca">
+            <label for="f-pipoca">🍿 Pipoca</label>
+            <input type="checkbox" name="food" id="f-cuscuz" value="Cuscuz">
+            <label for="f-cuscuz">🌾 Cuscuz</label>
+            <input type="checkbox" name="food" id="f-arroz" value="Arroz doce">
+            <label for="f-arroz">🍚 Arroz doce</label>
+            <input type="checkbox" name="food" id="f-outros" value="__outros__">
+            <label for="f-outros">✏️ Outros</label>
+            <input type="checkbox" name="food" id="f-nenhuma" value="__nenhuma__">
+            <label for="f-nenhuma">🚫 Nenhuma</label>
+          </div>
+          <div class="custom-wrap" id="food-custom-wrap">
+            <input type="text" class="text-input" id="food-custom" placeholder="Qual comidinha? 🍽️">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <span class="flabel">Bebida que vai trazer: <small>(pode marcar mais de uma)</small></span>
+          <div class="option-grid">
+            <input type="checkbox" name="drink" id="d-quentao" value="Quentão">
+            <label for="d-quentao">🔥 Quentão</label>
+            <input type="checkbox" name="drink" id="d-licor" value="Licor caseiro">
+            <label for="d-licor">🍶 Licor caseiro</label>
+            <input type="checkbox" name="drink" id="d-suco" value="Suco de maracujá">
+            <label for="d-suco">🥤 Suco de maracujá</label>
+            <input type="checkbox" name="drink" id="d-ponche" value="Ponche">
+            <label for="d-ponche">🍹 Ponche</label>
+            <input type="checkbox" name="drink" id="d-refri" value="Refrigerante">
+            <label for="d-refri">🥤 Refrigerante</label>
+            <input type="checkbox" name="drink" id="d-agua" value="Água">
+            <label for="d-agua">💧 Água</label>
+            <input type="checkbox" name="drink" id="d-cerveja" value="Cerveja">
+            <label for="d-cerveja">🍺 Cerveja</label>
+            <input type="checkbox" name="drink" id="d-outros" value="__outros__">
+            <label for="d-outros">✏️ Outros</label>
+            <input type="checkbox" name="drink" id="d-nenhuma" value="__nenhuma__">
+            <label for="d-nenhuma">🚫 Nenhuma</label>
+          </div>
+          <div class="custom-wrap" id="drink-custom-wrap">
+            <input type="text" class="text-input" id="drink-custom" placeholder="Qual bebida? 🍾">
+          </div>
+        </div>
+
+        <button type="submit" class="btn-submit">🎆 Confirmar Presença! 🎆</button>
+      </form>
+      <div id="msg" class="msg"></div>
+    </div>
+  </div>
+
+  <!-- ── Lista de convidados ── -->
+  <div class="section-card">
+    <h2 class="section-card-title">👥 Turma do Forró</h2>
+    <div id="stats" class="stats"></div>
+    <div id="guests-list"><p class="empty">Carregando...</p></div>
+  </div>
+
+  <!-- ── O que vem aí ── -->
+  <div class="section-card">
+    <h2 class="section-card-title">🎉 O Que Vem Aí</h2>
+    <div class="items-cols">
+      <div>
+        <div class="items-col-title">🍽️ Comidas</div>
+        <div id="foods-list"></div>
+      </div>
+      <div>
+        <div class="items-col-title">🥤 Bebidas</div>
+        <div id="drinks-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Bottom bunting (flipped) ── -->
+<div class="bunting" style="transform:scaleY(-1); margin-top:-4px;">
+  <svg viewBox="0 0 1200 80" xmlns="http://www.w3.org/2000/svg">
+    <line x1="0" y1="18" x2="1200" y2="18" stroke="#5D3A1A" stroke-width="2.5"/>
+    <polygon points="100,18 132,72 68,72"    fill="#8e44ad"/>
+    <polygon points="200,18 232,72 168,72"   fill="#c0392b"/>
+    <polygon points="300,18 332,72 268,72"   fill="#f1c40f"/>
+    <polygon points="400,18 432,72 368,72"   fill="#27ae60"/>
+    <polygon points="500,18 532,72 468,72"   fill="#2980b9"/>
+    <polygon points="600,18 632,72 568,72"   fill="#e67e22"/>
+    <polygon points="700,18 732,72 668,72"   fill="#8e44ad"/>
+    <polygon points="800,18 832,72 768,72"   fill="#c0392b"/>
+    <polygon points="900,18 932,72 868,72"   fill="#f1c40f"/>
+    <polygon points="1000,18 1032,72 968,72" fill="#27ae60"/>
+    <polygon points="1100,18 1132,72 1068,72" fill="#2980b9"/>
+  </svg>
+</div>
+
+<script>
+  const SUPABASE_URL      = 'YOUR_SUPABASE_URL';
+  const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+
+  if (SUPABASE_URL === 'YOUR_SUPABASE_URL') {
+    document.getElementById('config-warn').style.display = 'block';
+  }
+
+  const { createClient } = supabase;
+  const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  let guests = [];
+
+  function esc(str) {
+    const d = document.createElement('div');
+    d.appendChild(document.createTextNode(String(str || '')));
+    return d.innerHTML;
+  }
+
+  // ── Carrega dados ──
+  async function loadGuests() {
+    const { data, error } = await db.from('guests').select('*').order('created_at', { ascending: true });
+    if (error) { console.error('Erro ao carregar:', error); return; }
+    guests = data || [];
+    render();
+  }
+
+  function render() {
+    renderStats();
+    renderGuests();
+    renderItems();
+  }
+
+  function renderStats() {
+    const total = guests.length;
+    const el = document.getElementById('stats');
+    el.innerHTML = total
+      ? `<span class="stat">👥 ${total} confirmado${total > 1 ? 's' : ''}</span>`
+      : '';
+  }
+
+  function renderGuests() {
+    const el = document.getElementById('guests-list');
+    if (!guests.length) {
+      el.innerHTML = '<p class="empty">Nenhum convidado ainda — seja o primeiro! 🎉</p>';
+      return;
+    }
+    el.innerHTML = guests.map(g => `
+      <div class="guest-row">
+        <span class="guest-name">${esc(g.name)}</span>
+        <button class="btn-remove" data-id="${g.id}" onclick="handleRemove(this)">Remover</button>
+      </div>
+    `).join('');
+  }
+
+  function handleRemove(btn) {
+    if (btn.dataset.confirm === '1') {
+      removeGuest(btn.dataset.id);
+    } else {
+      btn.dataset.confirm = '1';
+      btn.textContent = 'Tem certeza?';
+      btn.classList.add('confirming');
+      setTimeout(() => {
+        if (btn.isConnected && btn.dataset.confirm === '1') {
+          btn.dataset.confirm = '';
+          btn.textContent = 'Remover';
+          btn.classList.remove('confirming');
+        }
+      }, 3000);
+    }
+  }
+
+  async function removeGuest(id) {
+    const { error } = await db.from('guests').delete().eq('id', id);
+    if (!error) {
+      guests = guests.filter(g => g.id !== id);
+      render();
+    }
+  }
+
+  function renderItems() {
+    const foodCount = {}, drinkCount = {};
+
+    for (const g of guests) {
+      for (const f of (g.food || [])) {
+        if (f === '__nenhuma__') continue;
+        const lbl = f === '__outros__' ? (g.food_custom || 'Outros') : f;
+        foodCount[lbl] = (foodCount[lbl] || 0) + 1;
+      }
+      for (const d of (g.drink || [])) {
+        if (d === '__nenhuma__') continue;
+        const lbl = d === '__outros__' ? (g.drink_custom || 'Outros') : d;
+        drinkCount[lbl] = (drinkCount[lbl] || 0) + 1;
+      }
+    }
+
+    const toHTML = (counts, empty) => {
+      const entries = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+      return entries.length
+        ? entries.map(([n, c]) => `<div class="item-row"><span>${esc(n)}</span><span class="item-count">${c}x</span></div>`).join('')
+        : `<p class="empty">${empty}</p>`;
+    };
+
+    document.getElementById('foods-list').innerHTML  = toHTML(foodCount,  'Nada ainda 😅');
+    document.getElementById('drinks-list').innerHTML = toHTML(drinkCount, 'Nada ainda 😅');
+  }
+
+  // ── Lógica de checkbox: Nenhuma é exclusiva; Outros revela campo ──
+  function setupCheckboxGroup(name, wrapId) {
+    const checkboxes = document.querySelectorAll(`input[name="${name}"]`);
+    const nenhuma    = document.getElementById(`${name.charAt(0)}-nenhuma`);
+    const outros     = document.getElementById(`${name.charAt(0)}-outros`);
+
+    checkboxes.forEach(cb => {
+      cb.addEventListener('change', () => {
+        if (cb === nenhuma && cb.checked) {
+          checkboxes.forEach(o => { if (o !== nenhuma) o.checked = false; });
+        } else if (cb.checked && cb !== nenhuma) {
+          nenhuma.checked = false;
+        }
+        document.getElementById(wrapId).classList.toggle('show', outros.checked);
+      });
+    });
+  }
+
+  setupCheckboxGroup('food', 'food-custom-wrap');
+  setupCheckboxGroup('drink', 'drink-custom-wrap');
+
+  // ── Envio ──
+  document.getElementById('rsvp-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const name = document.getElementById('name').value.trim();
+    if (!name) return;
+
+    const food  = Array.from(document.querySelectorAll('input[name="food"]:checked')).map(el => el.value);
+    const drink = Array.from(document.querySelectorAll('input[name="drink"]:checked')).map(el => el.value);
+    const food_custom  = food.includes('__outros__')  ? document.getElementById('food-custom').value.trim()  : null;
+    const drink_custom = drink.includes('__outros__') ? document.getElementById('drink-custom').value.trim() : null;
+
+    const btn = e.target.querySelector('.btn-submit');
+    btn.disabled = true;
+    btn.textContent = 'Enviando...';
+
+    const { data, error } = await db.from('guests')
+      .insert({ name, food, food_custom, drink, drink_custom })
+      .select().single();
+
+    btn.disabled = false;
+    btn.textContent = '🎆 Confirmar Presença! 🎆';
+
+    if (error) {
+      showMsg('Erro ao confirmar. Tente novamente! 😬', 'error');
+      console.error(error);
+      return;
+    }
+
+    guests.push(data);
+    render();
+    e.target.reset();
+    document.getElementById('food-custom-wrap').classList.remove('show');
+    document.getElementById('drink-custom-wrap').classList.remove('show');
+    showMsg(`Uhul! ${esc(name)}, até o Arraiá! 🎉🌽`, 'success');
+  });
+
+  function showMsg(html, type) {
+    const el = document.getElementById('msg');
+    el.className = `msg ${type}`;
+    el.innerHTML = html;
+    clearTimeout(el._t);
+    el._t = setTimeout(() => { el.className = 'msg'; }, 6000);
+  }
+
+  // ── Realtime ──
+  db.channel('guests-realtime')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'guests' }, loadGuests)
+    .subscribe();
+
+  loadGuests();
+</script>
+</body>
+</html>
