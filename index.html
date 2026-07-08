@@ -392,7 +392,7 @@
   <div class="rope-divider"><span>📋 Confirmação 📋</span></div>
   <div class="card">
     <div class="card-inner">
-      <h2 class="card-title">🌟 Confirme sua<br>Presença! 🌟</h2>
+      <h2 class="card-title">🌟 Confirme sua Presença! 🌟</h2>
       <form id="rsvp-form">
 
         <div class="form-group">
@@ -455,7 +455,7 @@
           </div>
         </div>
 
-        <button type="submit" class="btn-submit">🎆 Confirmar Presença! 🎆</button>
+        <button type="submit" class="btn-submit">🎆 Confirmar<br>Presença! 🎆</button>
       </form>
       <div id="msg" class="msg"></div>
     </div>
@@ -690,7 +690,7 @@
     const{data,error}=await db.from('guests')
       .insert({name,food,food_custom,drink,drink_custom}).select().single();
 
-    btn.disabled=false;btn.textContent='🎆 Confirmar Presença! 🎆';
+    btn.disabled=false;btn.innerHTML='🎆 Confirmar<br>Presença! 🎆';
 
     if(error){showMsg('Erro ao confirmar. Tente novamente! 😬','error');console.error(error);return;}
 
