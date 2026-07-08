@@ -508,7 +508,7 @@
 
 <script>
   // ── Supabase ──
-  const SUPABASE_URL      = 'https://eluzbsyilziypysbpium.supabase.co/rest/v1/';
+  const SUPABASE_URL      = 'https://eluzbsyilziypysbpium.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVsdXpic3lpbHppeXB5c2JwaXVtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM1MjMzNTIsImV4cCI6MjA5OTA5OTM1Mn0.g2OgLiLwyrQ0-dkwvPpv6WKVsdXSqCly-UhIOVBdOuc';
   if (SUPABASE_URL === 'YOUR_SUPABASE_URL') document.getElementById('config-warn').style.display='block';
   const { createClient } = supabase;
@@ -651,15 +651,25 @@
   }
 
   // ── Checkbox logic ──
-  function setupGroup(name,wrapId){
-    const all=document.querySelectorAll(`input[name="${name}"]`);
-    const nenhuma=document.getElementById(`${name[0]}-nenhuma`);
-    const outros =document.getElementById(`${name[0]}-outros`);
-    all.forEach(cb=>cb.addEventListener('change',()=>{
-      if(cb===nenhuma&&cb.checked) all.forEach(o=>{if(o!==nenhuma)o.checked=false;});
-      else if(cb.checked&&cb!==nenhuma) nenhuma.checked=false;
-      document.getElementById(wrapId).classList.toggle('show',outros.checked);
-    }));
+  function setupGroup(name, wrapId) {
+    const all     = document.querySelectorAll(`input[name="${name}"]`);
+    const nenhuma = document.getElementById(`${name[0]}-nenhuma`);
+    const outros  = document.getElementById(`${name[0]}-outros`);
+    const wrap    = document.getElementById(wrapId);
+
+    nenhuma.addEventListener('change', () => {
+      if (!nenhuma.checked) return;
+      all.forEach(cb => { if (cb !== nenhuma) cb.checked = false; });
+      wrap.classList.remove('show');
+    });
+
+    all.forEach(cb => {
+      if (cb === nenhuma) return;
+      cb.addEventListener('change', () => {
+        if (cb.checked) nenhuma.checked = false;
+        wrap.classList.toggle('show', outros.checked);
+      });
+    });
   }
   setupGroup('food','food-custom-wrap');
   setupGroup('drink','drink-custom-wrap');
