@@ -328,12 +328,15 @@
       <stop offset="0%" stop-color="#fff9c4"/>
       <stop offset="100%" stop-color="#f9a825"/>
     </radialGradient>
+    <clipPath id="moonClip">
+      <circle cx="50" cy="50" r="45"/>
+    </clipPath>
   </defs>
   <circle cx="50" cy="50" r="45" fill="url(#moonGrad)"/>
-  <circle cx="75" cy="25" r="40" fill="#0d0233"/>
-  <circle cx="30" cy="35" r="5" fill="rgba(0,0,0,.12)"/>
-  <circle cx="55" cy="55" r="7" fill="rgba(0,0,0,.1)"/>
-  <circle cx="42" cy="65" r="4" fill="rgba(0,0,0,.08)"/>
+  <circle cx="75" cy="25" r="40" fill="#0d0233" clip-path="url(#moonClip)"/>
+  <circle cx="30" cy="35" r="5" fill="rgba(0,0,0,.12)" clip-path="url(#moonClip)"/>
+  <circle cx="55" cy="55" r="7" fill="rgba(0,0,0,.1)"  clip-path="url(#moonClip)"/>
+  <circle cx="42" cy="65" r="4" fill="rgba(0,0,0,.08)" clip-path="url(#moonClip)"/>
 </svg>
 
 <!-- ── Top bunting double row ── -->
