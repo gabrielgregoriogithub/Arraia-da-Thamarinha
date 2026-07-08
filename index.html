@@ -8,198 +8,401 @@
   <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Patrick+Hand&display=swap" rel="stylesheet">
   <style>
     :root {
-      --red: #c0392b; --yellow: #f1c40f; --green: #27ae60;
-      --blue: #2980b9; --orange: #e67e22; --purple: #8e44ad;
-      --bg: #fff8e1; --wood: #7B4A2A; --wood-dark: #4a2c0a;
-      --cream: #fffde7; --text: #3e2723;
+      --red:#c0392b; --yellow:#f1c40f; --green:#27ae60;
+      --blue:#2980b9; --orange:#e67e22; --purple:#8e44ad;
+      --wood:#7B4A2A; --wood-dark:#3a1a05; --cream:#fffde7; --text:#3e2723;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    *{box-sizing:border-box;margin:0;padding:0;}
+
+    /* ── Night sky ── */
     body {
-      background: var(--bg);
-      font-family: 'Patrick Hand', cursive;
-      min-height: 100vh;
-      color: var(--text);
+      min-height:100vh;
+      background: linear-gradient(175deg,
+        #06001a 0%, #0d0233 18%, #1a0a55 34%,
+        #2d0d6e 46%, #5c1a1a 68%, #8B2500 84%, #c44000 100%);
+      font-family:'Patrick Hand',cursive;
+      color:#fff;
+      overflow-x:hidden;
     }
+
+    /* ── Stars layer ── */
+    #stars{position:fixed;inset:0;pointer-events:none;z-index:1;}
+
+    /* ── Lanterns layer ── */
+    #lanterns{position:fixed;inset:0;pointer-events:none;z-index:2;}
+    .balao{
+      position:absolute;
+      bottom:-160px;
+      animation:float-up var(--dur,14s) ease-in-out infinite var(--delay,0s);
+      filter:drop-shadow(0 0 10px var(--glow,#ff9900));
+    }
+    @keyframes float-up{
+      0%  {transform:translateY(0)    rotate(-4deg);opacity:0;}
+      8%  {opacity:1;}
+      50% {transform:translateY(-55vh) rotate(3deg); opacity:1;}
+      92% {opacity:.7;}
+      100%{transform:translateY(-115vh) rotate(-2deg);opacity:0;}
+    }
+    .balao-body{
+      width:var(--w,52px);height:var(--h,72px);
+      background:radial-gradient(circle at 35% 30%, rgba(255,255,255,.35), transparent 60%),
+                 var(--color,#e67e22);
+      border-radius:50% 50% 38% 38% / 55% 55% 45% 45%;
+      position:relative;
+    }
+    .balao-cone{
+      width:0;height:0;
+      border-left:calc(var(--w,52px)*.22) solid transparent;
+      border-right:calc(var(--w,52px)*.22) solid transparent;
+      border-top:calc(var(--h,72px)*.22) solid var(--cone,#b85000);
+      margin:0 auto;
+    }
+    .balao-flame{
+      width:10px;height:14px;
+      background:radial-gradient(ellipse at 50% 100%, #fff 0%, #ffd700 40%, #ff6600 80%, transparent 100%);
+      border-radius:50% 50% 30% 30%;
+      margin:3px auto 0;
+      animation:flicker 0.4s ease-in-out infinite alternate;
+    }
+    @keyframes flicker{0%{transform:scaleX(.9);}100%{transform:scaleX(1.1);}}
+
+    /* ── Moon ── */
+    .moon{
+      position:fixed;top:32px;right:48px;z-index:3;
+      width:70px;height:70px;pointer-events:none;
+      filter:drop-shadow(0 0 18px rgba(255,240,100,.8));
+    }
+
     /* ── Bunting ── */
-    .bunting { width: 100%; line-height: 0; }
-    .bunting svg { display: block; width: 100%; height: auto; }
-    /* ── Layout ── */
-    .container { max-width: 680px; margin: 0 auto; padding: 0 16px 48px; }
-    .page-title {
-      font-family: 'Fredoka One', cursive;
-      font-size: 2.2rem; text-align: center;
-      color: var(--red); text-shadow: 2px 2px 0 var(--yellow);
-      margin: 16px 0 10px;
+    .bunting{position:relative;z-index:10;line-height:0;}
+    .bunting svg{display:block;width:100%;height:auto;}
+    .flag{animation:sway 3s ease-in-out infinite;}
+    .flag:nth-child(odd){animation-delay:-1.5s;}
+    @keyframes sway{
+      0%,100%{transform:rotate(-4deg);}
+      50%    {transform:rotate(4deg); }
     }
-    /* ── Image ── */
-    .invite-img {
-      width: 100%; max-width: 480px; display: block;
-      margin: 0 auto 24px; border-radius: 12px;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.25);
-      border: 4px solid var(--wood);
+
+    /* ── Container ── */
+    .container{
+      max-width:700px;margin:0 auto;
+      padding:0 16px 60px;
+      position:relative;z-index:10;
     }
-    /* ── Card (form) ── */
-    .card {
-      background: var(--wood); border-radius: 16px;
-      padding: 20px; margin-bottom: 24px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+
+    /* ── Header ── */
+    .page-header{text-align:center;margin:8px 0 20px;}
+    .page-title{
+      font-family:'Fredoka One',cursive;
+      font-size:2.8rem;letter-spacing:1px;
+      color:var(--yellow);
+      text-shadow:3px 3px 0 #a07000, 0 0 30px rgba(255,210,0,.7);
+      line-height:1.1;
     }
-    .card-inner {
-      border: 2px dashed rgba(255,255,255,0.25);
-      border-radius: 10px; padding: 18px;
+    .page-sub{
+      font-family:'Fredoka One',cursive;
+      font-size:1.1rem;color:#ffcf70;
+      text-shadow:1px 1px 6px rgba(0,0,0,.8);
+      margin-top:4px;letter-spacing:2px;
     }
-    .card-title {
-      font-family: 'Fredoka One', cursive; font-size: 1.7rem;
-      color: var(--yellow); text-align: center;
-      text-shadow: 1px 1px 3px rgba(0,0,0,0.4); margin-bottom: 20px;
+    .deco-stars{
+      font-size:1.4rem;letter-spacing:6px;
+      color:var(--yellow);filter:drop-shadow(0 0 6px gold);
     }
-    .form-group { margin-bottom: 18px; }
-    .flabel { display: block; color: #fff; font-size: 1.05rem; font-weight: bold; margin-bottom: 8px; }
-    .flabel small { font-size: 0.8rem; font-weight: normal; opacity: 0.75; }
-    .text-input {
-      width: 100%; padding: 10px 14px; border-radius: 8px;
-      border: 2px solid transparent; font-family: 'Patrick Hand', cursive;
-      font-size: 1rem; background: var(--cream); color: var(--wood-dark);
-      transition: border-color 0.2s;
+
+    /* ── Invite image ── */
+    .invite-img{
+      width:100%;max-width:480px;display:block;
+      margin:0 auto 28px;border-radius:14px;
+      box-shadow:0 0 0 4px #f1c40f, 0 0 0 8px #c0392b,
+                 0 12px 40px rgba(0,0,0,.6);
+      animation:img-glow 3s ease-in-out infinite alternate;
     }
-    .text-input:focus { outline: none; border-color: var(--yellow); }
-    /* ── Option grid (checkboxes) ── */
-    .option-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(128px, 1fr));
-      gap: 7px;
+    @keyframes img-glow{
+      0% {box-shadow:0 0 0 4px #f1c40f,0 0 0 8px #c0392b,0 12px 40px rgba(0,0,0,.6),0 0 30px rgba(255,200,0,.2);}
+      100%{box-shadow:0 0 0 4px #f1c40f,0 0 0 8px #c0392b,0 12px 40px rgba(0,0,0,.6),0 0 50px rgba(255,200,0,.5);}
     }
-    .option-grid input[type="checkbox"] { display: none; }
-    .option-grid label {
-      background: rgba(255,255,255,0.15); color: #fff;
-      border: 2px solid rgba(255,255,255,0.2); border-radius: 10px;
-      padding: 8px 8px; cursor: pointer; text-align: center;
-      font-size: 0.87rem; transition: all 0.15s; display: block;
+
+    /* ── Rope divider ── */
+    .rope-divider{
+      position:relative;text-align:center;margin:4px 0 20px;
     }
-    .option-grid input[type="checkbox"]:checked + label {
-      background: var(--yellow); color: var(--wood-dark);
-      border-color: var(--yellow); font-weight: bold;
+    .rope-divider::before,.rope-divider::after{
+      content:'';position:absolute;top:50%;
+      width:35%;height:3px;
+      background:repeating-linear-gradient(90deg,#8B5E3C 0,#8B5E3C 6px,#c8a060 6px,#c8a060 12px);
+      border-radius:2px;
     }
-    .option-grid label:hover { background: rgba(255,255,255,0.25); }
-    .custom-wrap { display: none; margin-top: 8px; }
-    .custom-wrap.show { display: block; }
+    .rope-divider::before{left:0;}
+    .rope-divider::after{right:0;}
+    .rope-divider span{
+      font-family:'Fredoka One',cursive;
+      font-size:1.4rem;color:var(--yellow);
+      text-shadow:0 0 10px rgba(255,200,0,.6);
+      padding:0 12px;position:relative;
+    }
+
+    /* ── Form card ── */
+    .card{
+      border-radius:16px;padding:4px;margin-bottom:28px;
+      background:linear-gradient(135deg,#f1c40f,#e67e22,#c0392b,#8e44ad,#2980b9,#27ae60,#f1c40f);
+      background-size:300% 300%;
+      animation:border-spin 6s linear infinite;
+      box-shadow:0 8px 32px rgba(0,0,0,.5);
+    }
+    @keyframes border-spin{0%{background-position:0% 50%}100%{background-position:300% 50%}}
+    .card-inner{
+      border-radius:13px;padding:22px;
+      background:
+        repeating-linear-gradient(90deg,rgba(0,0,0,0) 0,rgba(0,0,0,0) 38px,rgba(0,0,0,.04) 38px,rgba(0,0,0,.04) 39px),
+        linear-gradient(170deg,#8B5E3C 0%,#5D3A1A 45%,#7B4A2A 75%,#4a2c0a 100%);
+    }
+    .card-title{
+      font-family:'Fredoka One',cursive;font-size:1.8rem;
+      color:var(--yellow);text-align:center;
+      text-shadow:2px 2px 4px rgba(0,0,0,.5),0 0 20px rgba(255,210,0,.5);
+      margin-bottom:22px;letter-spacing:.5px;
+    }
+    .form-group{margin-bottom:20px;}
+    .flabel{display:block;color:#ffe082;font-size:1.05rem;font-weight:bold;margin-bottom:8px;
+      text-shadow:1px 1px 3px rgba(0,0,0,.4);}
+    .flabel small{font-size:.78rem;font-weight:normal;opacity:.75;}
+    .text-input{
+      width:100%;padding:10px 14px;border-radius:8px;
+      border:2px solid rgba(241,196,15,.3);
+      font-family:'Patrick Hand',cursive;font-size:1rem;
+      background:rgba(255,253,231,.92);color:var(--wood-dark);
+      transition:border-color .2s,box-shadow .2s;
+    }
+    .text-input:focus{outline:none;border-color:var(--yellow);box-shadow:0 0 10px rgba(241,196,15,.4);}
+
+    /* ── Checkboxes ── */
+    .option-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(128px,1fr));
+      gap:7px;
+    }
+    .option-grid input[type="checkbox"]{display:none;}
+    .option-grid label{
+      background:rgba(255,255,255,.12);color:#fff;
+      border:2px solid rgba(255,255,255,.2);border-radius:10px;
+      padding:8px 6px;cursor:pointer;text-align:center;
+      font-size:.87rem;transition:all .15s;display:block;
+      text-shadow:1px 1px 2px rgba(0,0,0,.5);
+    }
+    .option-grid input[type="checkbox"]:checked+label{
+      background:var(--yellow);color:var(--wood-dark);
+      border-color:var(--yellow);font-weight:bold;
+      text-shadow:none;box-shadow:0 0 10px rgba(241,196,15,.5);
+    }
+    .option-grid label:hover{background:rgba(255,255,255,.22);}
+    .custom-wrap{display:none;margin-top:8px;}
+    .custom-wrap.show{display:block;}
+
     /* ── Submit ── */
-    .btn-submit {
-      width: 100%; padding: 14px; background: var(--red); color: #fff;
-      border: none; border-radius: 10px;
-      font-family: 'Fredoka One', cursive; font-size: 1.4rem;
-      cursor: pointer; margin-top: 8px;
-      box-shadow: 0 5px 0 #922b21;
-      transition: transform 0.1s, box-shadow 0.1s;
+    .btn-submit{
+      width:100%;padding:15px;
+      background:linear-gradient(135deg,#c0392b,#e74c3c,#c0392b);
+      background-size:200% 200%;
+      color:#fff;border:none;border-radius:10px;
+      font-family:'Fredoka One',cursive;font-size:1.5rem;
+      cursor:pointer;margin-top:10px;
+      box-shadow:0 6px 0 #922b21,0 0 20px rgba(192,57,43,.4);
+      transition:transform .1s,box-shadow .1s;
+      animation:btn-pulse 2s ease-in-out infinite;
     }
-    .btn-submit:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 7px 0 #922b21; }
-    .btn-submit:active:not(:disabled) { transform: translateY(3px); box-shadow: 0 2px 0 #922b21; }
-    .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+    @keyframes btn-pulse{
+      0%,100%{background-position:0% 50%;}
+      50%    {background-position:100% 50%;}
+    }
+    .btn-submit:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 0 #922b21,0 0 30px rgba(192,57,43,.5);}
+    .btn-submit:active:not(:disabled){transform:translateY(4px);box-shadow:0 2px 0 #922b21;}
+    .btn-submit:disabled{opacity:.6;cursor:not-allowed;}
+
     /* ── Toast ── */
-    .msg { margin-top: 12px; padding: 12px 16px; border-radius: 8px; text-align: center; display: none; }
-    .msg.success { background: #d4edda; color: #155724; display: block; border-left: 4px solid #28a745; }
-    .msg.error   { background: #f8d7da; color: #721c24; display: block; border-left: 4px solid #dc3545; }
+    .msg{margin-top:14px;padding:12px 16px;border-radius:8px;text-align:center;display:none;}
+    .msg.success{background:rgba(39,174,96,.25);color:#afffcf;display:block;
+      border:1px solid #27ae60;box-shadow:0 0 14px rgba(39,174,96,.3);}
+    .msg.error  {background:rgba(192,57,43,.25);color:#ffb3b3;display:block;
+      border:1px solid #c0392b;}
+
     /* ── Section cards ── */
-    .section-card {
-      background: #fff; border-radius: 14px; padding: 20px;
-      margin-bottom: 20px; box-shadow: 0 4px 14px rgba(0,0,0,0.1);
-      border-top: 4px solid var(--red);
+    .section-card{
+      background:rgba(255,253,231,.93);border-radius:14px;
+      padding:20px;margin-bottom:22px;
+      box-shadow:0 6px 24px rgba(0,0,0,.4);
+      border-top:5px solid var(--red);
+      position:relative;overflow:hidden;
     }
-    .section-card-title {
-      font-family: 'Fredoka One', cursive; font-size: 1.4rem;
-      color: var(--wood-dark); margin-bottom: 14px; text-align: center;
+    .section-card::before{
+      content:'';position:absolute;top:0;left:0;right:0;height:3px;
+      background:linear-gradient(90deg,var(--red),var(--yellow),var(--green),var(--blue),var(--purple),var(--red));
+      background-size:200% 100%;
+      animation:rainbow 4s linear infinite;
     }
+    @keyframes rainbow{0%{background-position:0%}100%{background-position:200%}}
+    .section-card-title{
+      font-family:'Fredoka One',cursive;font-size:1.5rem;
+      color:var(--wood-dark);margin-bottom:14px;text-align:center;
+    }
+
     /* ── Stats ── */
-    .stats { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 14px; }
-    .stat { background: var(--yellow); color: var(--wood-dark); border-radius: 20px; padding: 4px 14px; font-size: 0.9rem; font-weight: bold; }
+    .stats{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:14px;}
+    .stat{background:var(--yellow);color:var(--wood-dark);border-radius:20px;
+      padding:4px 14px;font-size:.9rem;font-weight:bold;
+      box-shadow:0 2px 6px rgba(0,0,0,.2);}
+
     /* ── Guest row ── */
-    .guest-row {
-      display: flex; align-items: center; padding: 10px 12px;
-      background: #fafafa; border-radius: 8px; margin-bottom: 8px;
-      border-left: 4px solid var(--red);
+    .guest-row{
+      display:flex;align-items:center;padding:10px 12px;
+      background:#fffef5;border-radius:8px;margin-bottom:8px;
+      border-left:4px solid var(--red);
+      box-shadow:0 2px 6px rgba(0,0,0,.07);
     }
-    .guest-name { flex: 1; font-weight: bold; font-size: 1rem; }
-    .btn-remove {
-      background: var(--red); color: #fff; border: none;
-      border-radius: 6px; padding: 5px 12px; cursor: pointer;
-      font-family: 'Patrick Hand', cursive; font-size: 0.85rem;
-      transition: background 0.2s; white-space: nowrap; flex-shrink: 0;
+    .guest-name{flex:1;font-weight:bold;font-size:1rem;color:var(--wood-dark);}
+    .btn-remove{
+      background:var(--red);color:#fff;border:none;
+      border-radius:6px;padding:5px 12px;cursor:pointer;
+      font-family:'Patrick Hand',cursive;font-size:.85rem;
+      transition:background .2s;white-space:nowrap;flex-shrink:0;
     }
-    .btn-remove:hover { background: #a93226; }
-    .btn-remove.confirming { background: #7b241c; }
+    .btn-remove:hover{background:#a93226;}
+    .btn-remove.confirming{background:#7b241c;}
+
     /* ── Items ── */
-    .items-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-    .items-col-title { font-family: 'Fredoka One', cursive; font-size: 1.1rem; color: var(--wood-dark); margin-bottom: 10px; }
-    .item-row {
-      display: flex; justify-content: space-between; align-items: center;
-      background: #f5f5f5; border-radius: 20px; padding: 5px 12px;
-      margin-bottom: 6px; font-size: 0.92rem;
+    .items-cols{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+    .items-col-title{font-family:'Fredoka One',cursive;font-size:1.1rem;
+      color:var(--wood-dark);margin-bottom:10px;}
+    .item-row{
+      display:flex;justify-content:space-between;align-items:center;
+      background:#f5f5f5;border-radius:20px;padding:5px 12px;
+      margin-bottom:6px;font-size:.92rem;color:var(--text);
     }
-    .item-count {
-      background: var(--yellow); color: var(--wood-dark); border-radius: 12px;
-      padding: 1px 8px; font-weight: bold; font-size: 0.85rem; margin-left: 8px; white-space: nowrap;
+    .item-count{
+      background:var(--yellow);color:var(--wood-dark);border-radius:12px;
+      padding:1px 8px;font-weight:bold;font-size:.85rem;margin-left:8px;white-space:nowrap;
     }
-    .empty { color: #aaa; font-style: italic; text-align: center; padding: 10px 0; font-size: 0.9rem; }
-    /* ── Config warning ── */
-    .config-warn {
-      background: #fff3cd; border: 2px solid var(--orange); border-radius: 10px;
-      padding: 16px; margin-bottom: 20px; font-size: 0.95rem; color: #856404;
+    .empty{color:#aaa;font-style:italic;text-align:center;padding:10px 0;font-size:.9rem;}
+
+    /* ── Config warn ── */
+    .config-warn{
+      background:rgba(255,243,205,.95);border:2px solid var(--orange);
+      border-radius:10px;padding:16px;margin-bottom:20px;
+      font-size:.95rem;color:#856404;
     }
-    .config-warn code { background: rgba(0,0,0,0.08); padding: 1px 5px; border-radius: 3px; font-size: 0.9em; }
-    /* ── Responsive ── */
-    @media (max-width: 480px) {
-      .items-cols { grid-template-columns: 1fr; }
-      .option-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); }
-      .page-title { font-size: 1.7rem; }
+    .config-warn code{background:rgba(0,0,0,.08);padding:1px 5px;border-radius:3px;font-size:.9em;}
+
+    /* ── Fogueira bottom ── */
+    .fogueira{
+      text-align:center;font-size:3.5rem;line-height:1;
+      margin:24px 0 0;
+      filter:drop-shadow(0 0 20px #ff6600);
+      animation:fire-glow 1s ease-in-out infinite alternate;
+    }
+    @keyframes fire-glow{
+      0%{filter:drop-shadow(0 0 15px #ff4400);}
+      100%{filter:drop-shadow(0 0 35px #ff9900);}
+    }
+
+    @media(max-width:480px){
+      .items-cols{grid-template-columns:1fr;}
+      .option-grid{grid-template-columns:repeat(auto-fill,minmax(110px,1fr));}
+      .page-title{font-size:2rem;}
     }
   </style>
 </head>
 <body>
 
-<!-- ── Top bunting ── -->
+<!-- ── Stars ── -->
+<div id="stars"></div>
+
+<!-- ── Floating lanterns ── -->
+<div id="lanterns">
+  <!-- generated by JS -->
+</div>
+
+<!-- ── Moon ── -->
+<svg class="moon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="moonGrad" cx="40%" cy="40%">
+      <stop offset="0%" stop-color="#fff9c4"/>
+      <stop offset="100%" stop-color="#f9a825"/>
+    </radialGradient>
+  </defs>
+  <circle cx="50" cy="50" r="45" fill="url(#moonGrad)"/>
+  <circle cx="75" cy="25" r="40" fill="#0d0233"/>
+  <circle cx="30" cy="35" r="5" fill="rgba(0,0,0,.12)"/>
+  <circle cx="55" cy="55" r="7" fill="rgba(0,0,0,.1)"/>
+  <circle cx="42" cy="65" r="4" fill="rgba(0,0,0,.08)"/>
+</svg>
+
+<!-- ── Top bunting double row ── -->
 <div class="bunting">
-  <svg viewBox="0 0 1200 80" xmlns="http://www.w3.org/2000/svg">
-    <line x1="0" y1="18" x2="1200" y2="18" stroke="#5D3A1A" stroke-width="2.5"/>
-    <polygon points="50,18 82,72 18,72"     fill="#c0392b"/>
-    <polygon points="150,18 182,72 118,72"  fill="#f1c40f"/>
-    <polygon points="250,18 282,72 218,72"  fill="#27ae60"/>
-    <polygon points="350,18 382,72 318,72"  fill="#2980b9"/>
-    <polygon points="450,18 482,72 418,72"  fill="#e67e22"/>
-    <polygon points="550,18 582,72 518,72"  fill="#8e44ad"/>
-    <polygon points="650,18 682,72 618,72"  fill="#c0392b"/>
-    <polygon points="750,18 782,72 718,72"  fill="#f1c40f"/>
-    <polygon points="850,18 882,72 818,72"  fill="#27ae60"/>
-    <polygon points="950,18 982,72 918,72"  fill="#2980b9"/>
-    <polygon points="1050,18 1082,72 1018,72" fill="#e67e22"/>
-    <polygon points="1150,18 1182,72 1118,72" fill="#c0392b"/>
+  <svg viewBox="0 0 1200 120" xmlns="http://www.w3.org/2000/svg">
+    <!-- ropes -->
+    <line x1="0" y1="20" x2="1200" y2="20" stroke="#5D3A1A" stroke-width="2.5"/>
+    <line x1="0" y1="50" x2="1200" y2="50" stroke="#5D3A1A" stroke-width="2"/>
+    <!-- Row 1: big flags -->
+    <g class="flag" style="transform-origin:50px 20px">  <polygon points="50,20 86,82 14,82"  fill="#c0392b"/></g>
+    <g class="flag" style="transform-origin:150px 20px"> <polygon points="150,20 186,82 114,82" fill="#f1c40f"/></g>
+    <g class="flag" style="transform-origin:250px 20px"> <polygon points="250,20 286,82 214,82" fill="#27ae60"/></g>
+    <g class="flag" style="transform-origin:350px 20px"> <polygon points="350,20 386,82 314,82" fill="#2980b9"/></g>
+    <g class="flag" style="transform-origin:450px 20px"> <polygon points="450,20 486,82 414,82" fill="#e67e22"/></g>
+    <g class="flag" style="transform-origin:550px 20px"> <polygon points="550,20 586,82 514,82" fill="#8e44ad"/></g>
+    <g class="flag" style="transform-origin:650px 20px"> <polygon points="650,20 686,82 614,82" fill="#c0392b"/></g>
+    <g class="flag" style="transform-origin:750px 20px"> <polygon points="750,20 786,82 714,82" fill="#f1c40f"/></g>
+    <g class="flag" style="transform-origin:850px 20px"> <polygon points="850,20 886,82 814,82" fill="#27ae60"/></g>
+    <g class="flag" style="transform-origin:950px 20px"> <polygon points="950,20 986,82 914,82" fill="#2980b9"/></g>
+    <g class="flag" style="transform-origin:1050px 20px"><polygon points="1050,20 1086,82 1014,82" fill="#e67e22"/></g>
+    <g class="flag" style="transform-origin:1150px 20px"><polygon points="1150,20 1186,82 1114,82" fill="#c0392b"/></g>
+    <!-- Row 2: small offset flags -->
+    <g class="flag" style="transform-origin:100px 50px;animation-delay:-0.8s">  <polygon points="100,50 124,90 76,90"  fill="#f1c40f" opacity=".9"/></g>
+    <g class="flag" style="transform-origin:200px 50px;animation-delay:-2s">    <polygon points="200,50 224,90 176,90" fill="#c0392b" opacity=".9"/></g>
+    <g class="flag" style="transform-origin:300px 50px;animation-delay:-0.4s">  <polygon points="300,50 324,90 276,90" fill="#8e44ad" opacity=".9"/></g>
+    <g class="flag" style="transform-origin:400px 50px;animation-delay:-1.2s">  <polygon points="400,50 424,90 376,90" fill="#27ae60" opacity=".9"/></g>
+    <g class="flag" style="transform-origin:500px 50px;animation-delay:-2.5s">  <polygon points="500,50 524,90 476,90" fill="#2980b9" opacity=".9"/></g>
+    <g class="flag" style="transform-origin:600px 50px;animation-delay:-0.6s">  <polygon points="600,50 624,90 576,90" fill="#e67e22" opacity=".9"/></g>
+    <g class="flag" style="transform-origin:700px 50px;animation-delay:-1.8s">  <polygon points="700,50 724,90 676,90" fill="#f1c40f" opacity=".9"/></g>
+    <g class="flag" style="transform-origin:800px 50px;animation-delay:-0.3s">  <polygon points="800,50 824,90 776,90" fill="#c0392b" opacity=".9"/></g>
+    <g class="flag" style="transform-origin:900px 50px;animation-delay:-1.5s">  <polygon points="900,50 924,90 876,90" fill="#8e44ad" opacity=".9"/></g>
+    <g class="flag" style="transform-origin:1000px 50px;animation-delay:-2.2s"> <polygon points="1000,50 1024,90 976,90" fill="#27ae60" opacity=".9"/></g>
+    <g class="flag" style="transform-origin:1100px 50px;animation-delay:-0.9s"> <polygon points="1100,50 1124,90 1076,90" fill="#2980b9" opacity=".9"/></g>
   </svg>
 </div>
 
 <div class="container">
-  <h1 class="page-title">🌟 Arraiá do QG 🌟</h1>
+
+  <!-- ── Header ── -->
+  <div class="page-header">
+    <div class="deco-stars">★ ✦ ★ ✦ ★</div>
+    <h1 class="page-title">🌽 Arraiá do QG 🌽</h1>
+    <div class="page-sub">🤠 Thamarinha convida! 🤠</div>
+    <div class="deco-stars" style="margin-top:6px">✦ ★ ✦ ★ ✦</div>
+  </div>
 
   <img src="./thamarinha.png" alt="Convite Arraiá do QG – Thamarinha" class="invite-img">
 
   <div class="config-warn" id="config-warn" style="display:none">
-    ⚠️ <strong>Configure o Supabase:</strong> Abra o <code>index.html</code>, localize
-    <code>SUPABASE_URL</code> e <code>SUPABASE_ANON_KEY</code> e substitua pelos valores do seu projeto.
+    ⚠️ <strong>Configure o Supabase:</strong> localize <code>SUPABASE_URL</code> e
+    <code>SUPABASE_ANON_KEY</code> no script e substitua pelos valores do seu projeto.
     Execute <code>supabase_setup.sql</code> no SQL Editor antes de usar.
   </div>
 
   <!-- ── Formulário ── -->
+  <div class="rope-divider"><span>📋 Confirmação 📋</span></div>
   <div class="card">
     <div class="card-inner">
-      <h2 class="card-title">🌽 Confirme sua Presença! 🌽</h2>
+      <h2 class="card-title">🌟 Confirme sua Presença! 🌟</h2>
       <form id="rsvp-form">
 
         <div class="form-group">
-          <label class="flabel" for="name">Seu nome:</label>
+          <label class="flabel" for="name">🤠 Seu nome:</label>
           <input type="text" id="name" class="text-input"
                  placeholder="Como te chamam no forró?" required autocomplete="off">
         </div>
 
         <div class="form-group">
-          <span class="flabel">Comidinha que vai trazer: <small>(pode marcar mais de uma)</small></span>
+          <span class="flabel">🍽️ Comidinha que vai trazer: <small>(pode marcar mais de uma)</small></span>
           <div class="option-grid">
             <input type="checkbox" name="food" id="f-canjica" value="Canjica">
             <label for="f-canjica">🌽 Canjica</label>
@@ -226,14 +429,14 @@
         </div>
 
         <div class="form-group">
-          <span class="flabel">Bebida que vai trazer: <small>(pode marcar mais de uma)</small></span>
+          <span class="flabel">🥤 Bebida que vai trazer: <small>(pode marcar mais de uma)</small></span>
           <div class="option-grid">
             <input type="checkbox" name="drink" id="d-quentao" value="Quentão">
             <label for="d-quentao">🔥 Quentão</label>
             <input type="checkbox" name="drink" id="d-licor" value="Licor caseiro">
             <label for="d-licor">🍶 Licor caseiro</label>
             <input type="checkbox" name="drink" id="d-suco" value="Suco de maracujá">
-            <label for="d-suco">🥤 Suco de maracujá</label>
+            <label for="d-suco">🥤 Suco maracujá</label>
             <input type="checkbox" name="drink" id="d-ponche" value="Ponche">
             <label for="d-ponche">🍹 Ponche</label>
             <input type="checkbox" name="drink" id="d-refri" value="Refrigerante">
@@ -259,15 +462,17 @@
   </div>
 
   <!-- ── Lista de convidados ── -->
+  <div class="rope-divider"><span>👥 Turma do Forró 👥</span></div>
   <div class="section-card">
-    <h2 class="section-card-title">👥 Turma do Forró</h2>
+    <h2 class="section-card-title">🤠 Convidados Confirmados 🤠</h2>
     <div id="stats" class="stats"></div>
     <div id="guests-list"><p class="empty">Carregando...</p></div>
   </div>
 
   <!-- ── O que vem aí ── -->
+  <div class="rope-divider"><span>🎉 O Que Vem Aí 🎉</span></div>
   <div class="section-card">
-    <h2 class="section-card-title">🎉 O Que Vem Aí</h2>
+    <h2 class="section-card-title">🌽 Mesa do Arraiá 🌽</h2>
     <div class="items-cols">
       <div>
         <div class="items-col-title">🍽️ Comidas</div>
@@ -279,201 +484,222 @@
       </div>
     </div>
   </div>
+
+  <div class="fogueira">🔥🪵🔥</div>
 </div>
 
 <!-- ── Bottom bunting (flipped) ── -->
-<div class="bunting" style="transform:scaleY(-1); margin-top:-4px;">
+<div class="bunting" style="transform:scaleY(-1);margin-top:16px;">
   <svg viewBox="0 0 1200 80" xmlns="http://www.w3.org/2000/svg">
     <line x1="0" y1="18" x2="1200" y2="18" stroke="#5D3A1A" stroke-width="2.5"/>
-    <polygon points="100,18 132,72 68,72"    fill="#8e44ad"/>
-    <polygon points="200,18 232,72 168,72"   fill="#c0392b"/>
-    <polygon points="300,18 332,72 268,72"   fill="#f1c40f"/>
-    <polygon points="400,18 432,72 368,72"   fill="#27ae60"/>
-    <polygon points="500,18 532,72 468,72"   fill="#2980b9"/>
-    <polygon points="600,18 632,72 568,72"   fill="#e67e22"/>
-    <polygon points="700,18 732,72 668,72"   fill="#8e44ad"/>
-    <polygon points="800,18 832,72 768,72"   fill="#c0392b"/>
-    <polygon points="900,18 932,72 868,72"   fill="#f1c40f"/>
-    <polygon points="1000,18 1032,72 968,72" fill="#27ae60"/>
-    <polygon points="1100,18 1132,72 1068,72" fill="#2980b9"/>
+    <g class="flag" style="transform-origin:100px 18px">  <polygon points="100,18 132,72 68,72"    fill="#8e44ad"/></g>
+    <g class="flag" style="transform-origin:200px 18px">  <polygon points="200,18 232,72 168,72"   fill="#c0392b"/></g>
+    <g class="flag" style="transform-origin:300px 18px">  <polygon points="300,18 332,72 268,72"   fill="#f1c40f"/></g>
+    <g class="flag" style="transform-origin:400px 18px">  <polygon points="400,18 432,72 368,72"   fill="#27ae60"/></g>
+    <g class="flag" style="transform-origin:500px 18px">  <polygon points="500,18 532,72 468,72"   fill="#2980b9"/></g>
+    <g class="flag" style="transform-origin:600px 18px">  <polygon points="600,18 632,72 568,72"   fill="#e67e22"/></g>
+    <g class="flag" style="transform-origin:700px 18px">  <polygon points="700,18 732,72 668,72"   fill="#8e44ad"/></g>
+    <g class="flag" style="transform-origin:800px 18px">  <polygon points="800,18 832,72 768,72"   fill="#c0392b"/></g>
+    <g class="flag" style="transform-origin:900px 18px">  <polygon points="900,18 932,72 868,72"   fill="#f1c40f"/></g>
+    <g class="flag" style="transform-origin:1000px 18px"> <polygon points="1000,18 1032,72 968,72" fill="#27ae60"/></g>
+    <g class="flag" style="transform-origin:1100px 18px"> <polygon points="1100,18 1132,72 1068,72" fill="#2980b9"/></g>
   </svg>
 </div>
 
 <script>
-  const SUPABASE_URL      = 'YOUR_SUPABASE_URL';
-  const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
-
-  if (SUPABASE_URL === 'YOUR_SUPABASE_URL') {
-    document.getElementById('config-warn').style.display = 'block';
-  }
-
+  // ── Supabase ──
+  const SUPABASE_URL      = 'https://eluzbsyilziypysbpium.supabase.co/rest/v1/';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVsdXpic3lpbHppeXB5c2JwaXVtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM1MjMzNTIsImV4cCI6MjA5OTA5OTM1Mn0.g2OgLiLwyrQ0-dkwvPpv6WKVsdXSqCly-UhIOVBdOuc';
+  if (SUPABASE_URL === 'YOUR_SUPABASE_URL') document.getElementById('config-warn').style.display='block';
   const { createClient } = supabase;
   const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
   let guests = [];
 
-  function esc(str) {
-    const d = document.createElement('div');
-    d.appendChild(document.createTextNode(String(str || '')));
+  // ── Stars ──
+  (function(){
+    const layer = document.getElementById('stars');
+    for (let i = 0; i < 70; i++) {
+      const s = document.createElement('div');
+      const size = Math.random() * 2.5 + 0.5;
+      s.style.cssText = `
+        position:absolute;
+        left:${Math.random()*100}%;
+        top:${Math.random()*60}%;
+        width:${size}px;height:${size}px;
+        background:#fff;border-radius:50%;
+        animation:twinkle ${1.5+Math.random()*3}s ease-in-out infinite ${Math.random()*4}s;
+        opacity:${.2+Math.random()*.8};
+      `;
+      layer.appendChild(s);
+    }
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes twinkle{
+        0%,100%{opacity:.15;transform:scale(.8);}
+        50%{opacity:1;transform:scale(1.4);}
+      }`;
+    document.head.appendChild(style);
+  })();
+
+  // ── Lanterns ──
+  (function(){
+    const colors=[
+      {color:'#e74c3c',cone:'#922b21',glow:'#ff4444'},
+      {color:'#f39c12',cone:'#d68910',glow:'#ff9900'},
+      {color:'#27ae60',cone:'#1e8449',glow:'#00ff88'},
+      {color:'#2980b9',cone:'#1a5276',glow:'#44aaff'},
+      {color:'#8e44ad',cone:'#6c3483',glow:'#cc44ff'},
+    ];
+    const container = document.getElementById('lanterns');
+    colors.forEach((c,i)=>{
+      const size = 44+i*6;
+      const el = document.createElement('div');
+      el.className='balao';
+      el.style.cssText=`
+        --dur:${13+i*2.5}s;--delay:${i*3.2}s;
+        --glow:${c.glow};--color:${c.color};--cone:${c.cone};
+        --w:${size}px;--h:${Math.round(size*1.38)}px;
+        left:${8+i*18}%;
+      `;
+      el.innerHTML=`
+        <div class="balao-body" style="width:${size}px;height:${Math.round(size*1.38)}px;
+          background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.35),transparent 60%),${c.color}"></div>
+        <div class="balao-cone" style="border-left:${Math.round(size*.22)}px solid transparent;
+          border-right:${Math.round(size*.22)}px solid transparent;
+          border-top:${Math.round(size*.22)}px solid ${c.cone};margin:0 auto"></div>
+        <div class="balao-flame"></div>
+      `;
+      container.appendChild(el);
+    });
+  })();
+
+  // ── Utils ──
+  function esc(str){
+    const d=document.createElement('div');
+    d.appendChild(document.createTextNode(String(str||'')));
     return d.innerHTML;
   }
 
-  // ── Carrega dados ──
-  async function loadGuests() {
-    const { data, error } = await db.from('guests').select('*').order('created_at', { ascending: true });
-    if (error) { console.error('Erro ao carregar:', error); return; }
-    guests = data || [];
-    render();
+  // ── Data ──
+  async function loadGuests(){
+    const{data,error}=await db.from('guests').select('*').order('created_at',{ascending:true});
+    if(error){console.error(error);return;}
+    guests=data||[];render();
   }
 
-  function render() {
-    renderStats();
-    renderGuests();
-    renderItems();
+  function render(){renderStats();renderGuests();renderItems();}
+
+  function renderStats(){
+    const el=document.getElementById('stats');
+    el.innerHTML=guests.length
+      ?`<span class="stat">👥 ${guests.length} confirmado${guests.length>1?'s':''}</span>`
+      :'';
   }
 
-  function renderStats() {
-    const total = guests.length;
-    const el = document.getElementById('stats');
-    el.innerHTML = total
-      ? `<span class="stat">👥 ${total} confirmado${total > 1 ? 's' : ''}</span>`
-      : '';
-  }
-
-  function renderGuests() {
-    const el = document.getElementById('guests-list');
-    if (!guests.length) {
-      el.innerHTML = '<p class="empty">Nenhum convidado ainda — seja o primeiro! 🎉</p>';
-      return;
-    }
-    el.innerHTML = guests.map(g => `
+  function renderGuests(){
+    const el=document.getElementById('guests-list');
+    if(!guests.length){el.innerHTML='<p class="empty">Nenhum convidado ainda — seja o primeiro! 🎉</p>';return;}
+    el.innerHTML=guests.map(g=>`
       <div class="guest-row">
         <span class="guest-name">${esc(g.name)}</span>
         <button class="btn-remove" data-id="${g.id}" onclick="handleRemove(this)">Remover</button>
-      </div>
-    `).join('');
+      </div>`).join('');
   }
 
-  function handleRemove(btn) {
-    if (btn.dataset.confirm === '1') {
+  function handleRemove(btn){
+    if(btn.dataset.confirm==='1'){
       removeGuest(btn.dataset.id);
-    } else {
-      btn.dataset.confirm = '1';
-      btn.textContent = 'Tem certeza?';
+    }else{
+      btn.dataset.confirm='1';
+      btn.textContent='Tem certeza?';
       btn.classList.add('confirming');
-      setTimeout(() => {
-        if (btn.isConnected && btn.dataset.confirm === '1') {
-          btn.dataset.confirm = '';
-          btn.textContent = 'Remover';
-          btn.classList.remove('confirming');
+      setTimeout(()=>{
+        if(btn.isConnected&&btn.dataset.confirm==='1'){
+          btn.dataset.confirm='';btn.textContent='Remover';btn.classList.remove('confirming');
         }
-      }, 3000);
+      },3000);
     }
   }
 
-  async function removeGuest(id) {
-    const { error } = await db.from('guests').delete().eq('id', id);
-    if (!error) {
-      guests = guests.filter(g => g.id !== id);
-      render();
-    }
+  async function removeGuest(id){
+    const{error}=await db.from('guests').delete().eq('id',id);
+    if(!error){guests=guests.filter(g=>g.id!==id);render();}
   }
 
-  function renderItems() {
-    const foodCount = {}, drinkCount = {};
-
-    for (const g of guests) {
-      for (const f of (g.food || [])) {
-        if (f === '__nenhuma__') continue;
-        const lbl = f === '__outros__' ? (g.food_custom || 'Outros') : f;
-        foodCount[lbl] = (foodCount[lbl] || 0) + 1;
+  function renderItems(){
+    const fc={},dc={};
+    for(const g of guests){
+      for(const f of(g.food||[])){
+        if(f==='__nenhuma__')continue;
+        const l=f==='__outros__'?(g.food_custom||'Outros'):f;
+        fc[l]=(fc[l]||0)+1;
       }
-      for (const d of (g.drink || [])) {
-        if (d === '__nenhuma__') continue;
-        const lbl = d === '__outros__' ? (g.drink_custom || 'Outros') : d;
-        drinkCount[lbl] = (drinkCount[lbl] || 0) + 1;
+      for(const d of(g.drink||[])){
+        if(d==='__nenhuma__')continue;
+        const l=d==='__outros__'?(g.drink_custom||'Outros'):d;
+        dc[l]=(dc[l]||0)+1;
       }
     }
-
-    const toHTML = (counts, empty) => {
-      const entries = Object.entries(counts).sort((a, b) => b[1] - a[1]);
-      return entries.length
-        ? entries.map(([n, c]) => `<div class="item-row"><span>${esc(n)}</span><span class="item-count">${c}x</span></div>`).join('')
-        : `<p class="empty">${empty}</p>`;
+    const toHTML=(c,empty)=>{
+      const e=Object.entries(c).sort((a,b)=>b[1]-a[1]);
+      return e.length
+        ?e.map(([n,c])=>`<div class="item-row"><span>${esc(n)}</span><span class="item-count">${c}x</span></div>`).join('')
+        :`<p class="empty">${empty}</p>`;
     };
-
-    document.getElementById('foods-list').innerHTML  = toHTML(foodCount,  'Nada ainda 😅');
-    document.getElementById('drinks-list').innerHTML = toHTML(drinkCount, 'Nada ainda 😅');
+    document.getElementById('foods-list').innerHTML =toHTML(fc,'Nada ainda 😅');
+    document.getElementById('drinks-list').innerHTML=toHTML(dc,'Nada ainda 😅');
   }
 
-  // ── Lógica de checkbox: Nenhuma é exclusiva; Outros revela campo ──
-  function setupCheckboxGroup(name, wrapId) {
-    const checkboxes = document.querySelectorAll(`input[name="${name}"]`);
-    const nenhuma    = document.getElementById(`${name.charAt(0)}-nenhuma`);
-    const outros     = document.getElementById(`${name.charAt(0)}-outros`);
-
-    checkboxes.forEach(cb => {
-      cb.addEventListener('change', () => {
-        if (cb === nenhuma && cb.checked) {
-          checkboxes.forEach(o => { if (o !== nenhuma) o.checked = false; });
-        } else if (cb.checked && cb !== nenhuma) {
-          nenhuma.checked = false;
-        }
-        document.getElementById(wrapId).classList.toggle('show', outros.checked);
-      });
-    });
+  // ── Checkbox logic ──
+  function setupGroup(name,wrapId){
+    const all=document.querySelectorAll(`input[name="${name}"]`);
+    const nenhuma=document.getElementById(`${name[0]}-nenhuma`);
+    const outros =document.getElementById(`${name[0]}-outros`);
+    all.forEach(cb=>cb.addEventListener('change',()=>{
+      if(cb===nenhuma&&cb.checked) all.forEach(o=>{if(o!==nenhuma)o.checked=false;});
+      else if(cb.checked&&cb!==nenhuma) nenhuma.checked=false;
+      document.getElementById(wrapId).classList.toggle('show',outros.checked);
+    }));
   }
+  setupGroup('food','food-custom-wrap');
+  setupGroup('drink','drink-custom-wrap');
 
-  setupCheckboxGroup('food', 'food-custom-wrap');
-  setupCheckboxGroup('drink', 'drink-custom-wrap');
-
-  // ── Envio ──
-  document.getElementById('rsvp-form').addEventListener('submit', async (e) => {
+  // ── Submit ──
+  document.getElementById('rsvp-form').addEventListener('submit',async(e)=>{
     e.preventDefault();
-    const name = document.getElementById('name').value.trim();
-    if (!name) return;
+    const name=document.getElementById('name').value.trim();
+    if(!name)return;
+    const food =Array.from(document.querySelectorAll('input[name="food"]:checked')).map(el=>el.value);
+    const drink=Array.from(document.querySelectorAll('input[name="drink"]:checked')).map(el=>el.value);
+    const food_custom =food.includes('__outros__') ?document.getElementById('food-custom').value.trim() :null;
+    const drink_custom=drink.includes('__outros__')?document.getElementById('drink-custom').value.trim():null;
 
-    const food  = Array.from(document.querySelectorAll('input[name="food"]:checked')).map(el => el.value);
-    const drink = Array.from(document.querySelectorAll('input[name="drink"]:checked')).map(el => el.value);
-    const food_custom  = food.includes('__outros__')  ? document.getElementById('food-custom').value.trim()  : null;
-    const drink_custom = drink.includes('__outros__') ? document.getElementById('drink-custom').value.trim() : null;
+    const btn=e.target.querySelector('.btn-submit');
+    btn.disabled=true;btn.textContent='Enviando...';
 
-    const btn = e.target.querySelector('.btn-submit');
-    btn.disabled = true;
-    btn.textContent = 'Enviando...';
+    const{data,error}=await db.from('guests')
+      .insert({name,food,food_custom,drink,drink_custom}).select().single();
 
-    const { data, error } = await db.from('guests')
-      .insert({ name, food, food_custom, drink, drink_custom })
-      .select().single();
+    btn.disabled=false;btn.textContent='🎆 Confirmar Presença! 🎆';
 
-    btn.disabled = false;
-    btn.textContent = '🎆 Confirmar Presença! 🎆';
+    if(error){showMsg('Erro ao confirmar. Tente novamente! 😬','error');console.error(error);return;}
 
-    if (error) {
-      showMsg('Erro ao confirmar. Tente novamente! 😬', 'error');
-      console.error(error);
-      return;
-    }
-
-    guests.push(data);
-    render();
+    guests.push(data);render();
     e.target.reset();
     document.getElementById('food-custom-wrap').classList.remove('show');
     document.getElementById('drink-custom-wrap').classList.remove('show');
-    showMsg(`Uhul! ${esc(name)}, até o Arraiá! 🎉🌽`, 'success');
+    showMsg(`Uhul! ${esc(name)}, até o Arraiá! 🎉🌽`,'success');
   });
 
-  function showMsg(html, type) {
-    const el = document.getElementById('msg');
-    el.className = `msg ${type}`;
-    el.innerHTML = html;
-    clearTimeout(el._t);
-    el._t = setTimeout(() => { el.className = 'msg'; }, 6000);
+  function showMsg(html,type){
+    const el=document.getElementById('msg');
+    el.className=`msg ${type}`;el.innerHTML=html;
+    clearTimeout(el._t);el._t=setTimeout(()=>{el.className='msg';},6000);
   }
 
   // ── Realtime ──
   db.channel('guests-realtime')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'guests' }, loadGuests)
+    .on('postgres_changes',{event:'*',schema:'public',table:'guests'},loadGuests)
     .subscribe();
 
   loadGuests();
